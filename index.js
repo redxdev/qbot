@@ -19,35 +19,35 @@ slack.on('message', function(msg) {
 
   var toSelf = '<@' + slack.slackData.self.id + '>';
 
-  if (data.users[msg.user] === undefined) {
-    data.users[msg.user] = '';
-  }
-
   console.log('[Receive] ' + slack.getUser(msg.user).name + ': ' + msg.text);
 
   if (msg.text.indexOf(toSelf) === 0) {
     var scan = msg.text.substring(toSelf.length);
-    var match = /^.*<@(?:.*)>.*$/g;
+    var match = /^.*<@(.*)>.*$/g;
     var result = match.exec(scan);
     if (result) {
-      var user = result[0];
+      var user = result[1];
+      console.log("[Lookup] User ID: " + user);
+      if(data.users[user] === undefined)
+        data.users[user] = [];
 
-      if(!data.users[result]) {
+      if(data.users[user].length === 0) {
         slack.sendMsg(msg.channel, "I don't have any data for that user!");
       }
       else {
         var m = markov(1);
-        m.seed(data.users[result], function () {
-          var person = slack.getUser(result) || '???';
-          var res = m.respond(m.pick()).join(' ');
-          slack.sendMsg(msg.channel, person + ' says, "' + res + '"');
-        });
+        for (var i = 0; i < data.users[user].length; ++i) {
+          m.seed(data.users[user][i]);
+        }
+
+        var res = m.respond(m.pick()).join(' ');
+        slack.sendMsg(msg.channel, '"' + res + '"');
       }
 
     }
   }
   else {
-    data.users[msg.user] += msg.text + '\n';
+    data.users[msg.user].push(msg.text);
     jetpack.write('data.json', data, {atomic: true});
   }
 });
