@@ -42,14 +42,8 @@ slack.on('message', function(msg) {
           m.seed(data.users[user][i]);
         }
 
-        user = slack.getUser(user);
-        if (!user)
-          user = '???'
-        else
-          user = user.name;
-
         var res = m.respond(m.pick()).join(' ');
-        res = user + ' says, "' + res + '"';
+        res = '<@' + user + '> says, "' + res + '"';
         console.log('[Response] ' + res);
         slack.sendMsg(msg.channel, res);
       }
