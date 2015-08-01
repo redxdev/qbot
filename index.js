@@ -47,6 +47,9 @@ slack.on('message', function(msg) {
     }
   }
   else {
+    if (data.users[msg.user] === undefined)
+      data.users[msg.user] = [];
+
     data.users[msg.user].push(msg.text);
     jetpack.write('data.json', data, {atomic: true});
   }
