@@ -5,7 +5,7 @@ var markov = require('markov');
 var localUserId = null;
 
 var slack = new slackAPI({
-  'token': 'xoxb-8513978759-tYPHYE1MYW4qTnZ3PDHQ0t5a',
+  'token': jetpack.read('config.json', 'json')['api-key'],
   'logging': false
 });
 
@@ -23,12 +23,12 @@ slack.on('message', function(msg) {
     data.users[msg.user] = '';
   }
 
+  console.log('[Receive] ' + slack.getUser(msg.user) + ':' + msg.text);
+
   if (msg.text.indexOf(toSelf) === 0) {
     var scan = msg.text.substring(toSelf.length);
     var match = /^.*<@(?:.*)>.*$/g;
     var result = match.exec(scan);
-    console.log(result);
-    console.log(scan);
     if (result) {
       var user = result[0];
 
