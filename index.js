@@ -32,14 +32,15 @@ slack.on('message', function(msg) {
     if (result) {
       var user = result[0];
 
-      if(!data.users[msg.user]) {
+      if(!data.users[result]) {
         slack.sendMsg(msg.channel, "I don't have any data for that user!");
       }
       else {
         var m = markov(1);
-        m.seed(data.users[msg.user], function () {
+        m.seed(data.users[result], function () {
+          var person = slack.getUser(result) || '???';
           var res = m.respond(m.pick()).join(' ');
-          slack.sendMsg(msg.channel, '"' + res + '"');
+          slack.sendMsg(msg.channel, person + ' says, "' + res + '"');
         });
       }
 
