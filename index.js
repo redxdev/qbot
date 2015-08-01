@@ -13,6 +13,8 @@ var data = jetpack.read('data.json', 'json') || {
   users: {}
 };
 
+console.log('Started qbot!');
+
 slack.on('message', function(msg) {
   if (typeof msg.text === 'undefined') return;
   if (slack.slackData.self.id === msg.user) return;
@@ -23,7 +25,7 @@ slack.on('message', function(msg) {
 
   if (msg.text.indexOf(toSelf) === 0) {
     var scan = msg.text.substring(toSelf.length);
-    var match = /^.*<@(.*)>.*$/g;
+    var match = /^.*<@(U........)>.*$/g;
     var result = match.exec(scan);
     if (result) {
       var user = result[1];
@@ -40,10 +42,17 @@ slack.on('message', function(msg) {
           m.seed(data.users[user][i]);
         }
 
-        var res = m.respond(m.pick()).join(' ');
-        slack.sendMsg(msg.channel, '"' + res + '"');
-      }
+        user = slack.getUser(user);
+        if (!user)
+          user = '???'
+        else
+          user = user.name;
 
+        var res = m.respond(m.pick()).join(' ');
+        res = user + ' says, "' + res + '"';
+        console.log('[Response] ' + res);
+        slack.sendMsg(msg.channel, res);
+      }
     }
   }
   else {
