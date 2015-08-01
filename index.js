@@ -1,8 +1,15 @@
 var slackAPI = require('slackbotapi');
 var jetpack = require('fs-jetpack');
 var markov = require('markov');
+var importer = require('./import');
+var argv = require('yargs').argv;
 
 var localUserId = null;
+
+if (argv.import) {
+  importer();
+  return;
+}
 
 var slack = new slackAPI({
   'token': jetpack.read('config.json', 'json')['api-key'],
