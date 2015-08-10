@@ -11,8 +11,10 @@ if (argv.import) {
   return;
 }
 
+var config = jetpack.read('config.json', 'json');
+
 var slack = new slackAPI({
-  'token': jetpack.read('config.json', 'json')['api-key'],
+  'token': config['api-key'],
   'logging': false
 });
 
@@ -44,12 +46,14 @@ slack.on('message', function(msg) {
         slack.sendMsg(msg.channel, "I don't have any data for that user!");
       }
       else {
-        var m = markov();
+        var m = markov(config.order);
         for (var i = 0; i < data.users[user].length; ++i) {
           m.seed(data.users[user][i]);
         }
 
-        var res = m.respond(m.pick()).join(' ');
+        var start = data.users[user][Math.floor(Math.random()*data.users[user].length)];
+        start = start.split(" ");
+        var res = m.respond(start[0] || m.pick()).join(' ');
         res = '<@' + user + '> says, "' + res + '"';
         console.log('[Response] ' + res);
         slack.sendMsg(msg.channel, res);
