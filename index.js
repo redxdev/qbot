@@ -44,7 +44,7 @@ slack.on('message', function(msg) {
         slack.sendMsg(msg.channel, "I don't have any data for that user!");
       }
       else {
-        var m = markov(1);
+        var m = markov();
         for (var i = 0; i < data.users[user].length; ++i) {
           m.seed(data.users[user][i]);
         }
