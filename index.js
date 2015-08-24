@@ -53,11 +53,24 @@ slack.on('message', function(msg) {
 
         var start = data.users[user][Math.floor(Math.random()*data.users[user].length)];
         start = start.split(" ");
-        var res = m.respond(start[0] || m.pick()).join(' ');
+        var res = m.respond(scan).join(' ');
         res = '<@' + user + '> says, "' + res + '"';
         console.log('[Response] ' + res);
         slack.sendMsg(msg.channel, res);
       }
+    }
+    else {
+      var m = markov(config.order);
+      for (var k in data.users) {
+        var user = data.users[k];
+        for (var i = 0; i < user.length; ++i) {
+          m.seed(user[i]);
+        }
+      }
+
+      var res = m.respond(scan).join(' ');
+      console.log('[Response] ' + res);
+      slack.sendMsg(msg.channel, res);
     }
   }
   else {
