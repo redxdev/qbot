@@ -90,7 +90,10 @@ slack.on('message', function(msg) {
       data.users[msg.user] = [];
     
     var text = msg.text.trim();
-    if (data.users[msg.user].indexOf(text) >= 0) return;
+    if (data.users[msg.user].indexOf(text) >= 0) {
+      console.log('Duplicate - ignoring');
+      return;
+    }
 
     data.users[msg.user].push(text);
     jetpack.write('data.json', data, {atomic: true});
