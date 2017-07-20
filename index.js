@@ -34,6 +34,8 @@ slack.on('message', function(msg) {
   var channel = slack.getChannel(msg.channel);
   console.log('[Receive] ' + slack.getUser(msg.user).name + ' in ' + (channel === null ? msg.channel : '#' + channel.name) + ': ' + msg.text);
 
+  slack.sendTyping(msg.channel);
+  
   if (msg.text.indexOf(toSelf) === 0) {
     var scan = msg.text.substring(toSelf.length);
     var match = /^.*<@(U........)>.*$/g;
