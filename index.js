@@ -52,6 +52,9 @@ slack.on('message', function(msg) {
       else if(data.users[user].length === 0) {
         slack.sendMsg(msg.channel, "I don't have any data for that user!");
       }
+      else if (data.users[user].length < 2) {
+        slack.sendMsg(msg.channel, "I don't have enough data for that user!");
+      }
       else {
         var m = markov(config.order);
         for (var i = 0; i < data.users[user].length; ++i) {
