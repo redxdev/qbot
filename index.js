@@ -30,7 +30,7 @@ slack.on('message', function(msg) {
 
   var toSelf = '<@' + slack.slackData.self.id + '>';
 
-  console.log('[Receive] ' + slack.getUser(msg.user).name + ' in ' + msg.channel + ': ' + msg.text);
+  console.log('[Receive] ' + slack.getUser(msg.user).name + ' in ' + slack.getChannel(msg.channel).name + ': ' + msg.text);
 
   if (msg.text.indexOf(toSelf) === 0) {
     var scan = msg.text.substring(toSelf.length);
