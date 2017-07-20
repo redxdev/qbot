@@ -88,8 +88,11 @@ slack.on('message', function(msg) {
     
     if (data.users[msg.user] === undefined)
       data.users[msg.user] = [];
+    
+    var text = msg.text.trim();
+    if (data.users[msg.user].indexOf(text) >= 0) return;
 
-    data.users[msg.user].push(msg.text);
+    data.users[msg.user].push(text);
     jetpack.write('data.json', data, {atomic: true});
   }
 });
