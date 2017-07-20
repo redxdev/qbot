@@ -93,7 +93,7 @@ slack.on('message', function(msg) {
     var lowerText = text.toLowerCase();
     var messages = data.users[msg.user];
     for (var i = 0; i < messages.length; ++i) {
-      if (lowerText === messages[i].toLowerCase() {
+      if (lowerText === messages[i].toLowerCase()) {
         console.log('Duplicate - ignoring');
         return;
       }
