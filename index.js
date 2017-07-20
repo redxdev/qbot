@@ -32,7 +32,7 @@ slack.on('message', function(msg) {
   var toSelf = '<@' + slack.slackData.self.id + '>';
 
   var channel = slack.getChannel(msg.channel);
-  console.log('[Receive] ' + slack.getUser(msg.user).name + ' in #' + (channel === null ? 'unknown' : channel.name) + ': ' + msg.text);
+  console.log('[Receive] ' + slack.getUser(msg.user).name + ' in #' + (channel === null ? msg.channel : channel.name) + ': ' + msg.text);
 
   if (msg.text.indexOf(toSelf) === 0) {
     var scan = msg.text.substring(toSelf.length);
@@ -43,8 +43,11 @@ slack.on('message', function(msg) {
       console.log("[Lookup] User ID: " + user);
       if(data.users[user] === undefined)
         data.users[user] = [];
-
-      if(data.users[user].length === 0) {
+      
+      if (config['ignore'].indexOf(user) >= 0) {
+        slack.sendMsg(msg.channel, "That user is ignored, sorry!");
+      }
+      else if(data.users[user].length === 0) {
         slack.sendMsg(msg.channel, "I don't have any data for that user!");
       }
       else {
