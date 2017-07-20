@@ -27,10 +27,12 @@ console.log('Started qbot!');
 slack.on('message', function(msg) {
   if (typeof msg.text === 'undefined') return;
   if (slack.slackData.self.id === msg.user) return;
+  if (config['ignore'].indexOf(msg.user) >= 0) return;
 
   var toSelf = '<@' + slack.slackData.self.id + '>';
 
-  console.log('[Receive] ' + slack.getUser(msg.user).name + ' in #' + slack.getChannel(msg.channel).name + ': ' + msg.text);
+  var channel = slack.getChannel(msg.channel);
+  console.log('[Receive] ' + slack.getUser(msg.user).name + ' in #' + (channel === null ? 'unknown' : channel.name) + ': ' + msg.text);
 
   if (msg.text.indexOf(toSelf) === 0) {
     var scan = msg.text.substring(toSelf.length);
