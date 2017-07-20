@@ -90,9 +90,13 @@ slack.on('message', function(msg) {
       data.users[msg.user] = [];
     
     var text = msg.text.trim();
-    if (data.users[msg.user].indexOf(text) >= 0) {
-      console.log('Duplicate - ignoring');
-      return;
+    var lowerText = text.toLowerCase();
+    var messages = data.users[msg.user];
+    for (var i = 0; i < messages.length; ++i) {
+      if (lowerText === messages[i].toLowerCase() {
+        console.log('Duplicate - ignoring');
+        return;
+      }
     }
 
     data.users[msg.user].push(text);
