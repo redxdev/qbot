@@ -81,6 +81,8 @@ slack.on('message', function(msg) {
     }
   }
   else {
+    if (msg.text.length > 140) return;
+    
     if (data.users[msg.user] === undefined)
       data.users[msg.user] = [];
 
