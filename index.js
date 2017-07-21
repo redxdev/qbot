@@ -4,7 +4,6 @@ var markov = require('markov');
 var importer = require('./import');
 var argv = require('yargs').argv;
 var levelup = require('levelup');
-var snoowrap = require('snoowrap');
 
 var localUserId = null;
 
@@ -38,26 +37,6 @@ if (argv.importdb) {
     console.log("Complete!");
     db.close();
     process.exit();
-  });
-
-  return;
-}
-
-if (argv.reddit) {
-  console.log("Importing reddit data...");
-  var reddit = snoowrap();
-
-  db.get('!reddit-' + argv.reddit, function (err, value) {
-    if (err) value = [];
-
-    reddit.getSubreddit(argv.reddit)
-      .getTop({time: 'all'})
-      .map(function (post) {
-        console.log(post);
-      })
-      .then(function () {
-        process.exit();
-      });
   });
 
   return;
