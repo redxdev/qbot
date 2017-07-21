@@ -55,6 +55,26 @@ db.createValueStream()
 
 console.log('Started qbot!');
 
+function processResponse(res) {
+  res.forEach(function (w, i) {
+    var userMatch = match;
+    var commandMatch = /^.*<!(.*)(|.*)?>.*$/g;
+    var result = userMatch.exec(w);
+    if (result) {
+      var usr = slack.getUser(result[1]);
+      res[i] = usr ? usr.name : '(unknown user)';
+    }
+    else {
+      result = commandMatch.exec(w);
+      if (result) {
+        res[i] = '@ ' + result[1];
+      }
+    }
+  });
+
+  return res;
+}
+
 slack.on('message', function(msg) {
   if (typeof msg.text === 'undefined') return;
   if (slack.slackData.self.id === msg.user) return;
@@ -91,8 +111,9 @@ slack.on('message', function(msg) {
         else {
           var m = markov(config.order);
           quotes.forEach(function (q) {m.seed(q);});
+          var res = m.respond(scan);
 
-          var res = m.respond(scan).join(' ');
+          var res = processResponse(m.respond(scan)).join(' ');
           res = '<@' + user + '> says, "' + res + '"';
           console.log('[Response] ' + res);
           slack.sendMsg(msg.channel, res);
@@ -100,7 +121,7 @@ slack.on('message', function(msg) {
       });
     }
     else {
-      var res = globalM.respond(scan).join(' ');
+      var res = processResponse(globalM.respond(scan)).join(' ');
       console.log('[Response] ' + res);
       slack.sendMsg(msg.channel, res);
       var m = markov(config.order);
