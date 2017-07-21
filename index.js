@@ -92,7 +92,7 @@ slack.on('message', function(msg) {
       var m = markov(config.order);
       db.createValueStream()
         .on('data', function (data) {
-          m.seed(data);
+          data.forEach(function (q) {m.seed(q);});
         })
         .on('error', function (err) {
           slack.sendMsg(msg.channel, "Something went wrong!");
@@ -111,7 +111,7 @@ slack.on('message', function(msg) {
       return;
     }
 
-    db.get(user, function (err, value) {
+    db.get(msg.user, function (err, value) {
       var quotes = err.notFound ? [] : value;
       
       var text = msg.text.trim();
