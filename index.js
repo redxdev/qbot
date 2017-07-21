@@ -133,6 +133,11 @@ slack.on('message', function(msg) {
       return;
     }
 
+    if (!msg.user) {
+      console.log("Undefined user received as part of message!");
+      return;
+    }
+
     db.get(msg.user, function (err, value) {
       var quotes = err ? [] : value;
       
