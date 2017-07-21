@@ -112,7 +112,7 @@ slack.on('message', function(msg) {
     }
 
     db.get(msg.user, function (err, value) {
-      var quotes = err.notFound ? [] : value;
+      var quotes = err ? [] : value;
       
       var text = msg.text.trim();
       var lowerText = text.toLowerCase();
