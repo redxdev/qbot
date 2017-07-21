@@ -57,7 +57,7 @@ console.log('Started qbot!');
 
 function processResponse(res) {
   res.forEach(function (w, i) {
-    var userMatch = match;
+    var userMatch = /^.*<@(U........)>.*$/g;
     var commandMatch = /^.*<!(.*)(|.*)?>.*$/g;
     var result = userMatch.exec(w);
     if (result) {
