@@ -106,8 +106,8 @@ slack.on('message', function(msg) {
     }
   }
   else {
-    if (msg.text.length > 200) {
-      console.log("Message too long - ignoring");
+    if (msg.text.length > 240) {
+      console.log("Message too long (" + msg.text.length + ") - ignoring");
       return;
     }
 
