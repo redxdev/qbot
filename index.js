@@ -62,7 +62,7 @@ function processResponse(res) {
     var result = userMatch.exec(w);
     if (result) {
       var usr = slack.getUser(result[1]);
-      res[i] = usr ? usr.name : '(unknown user)';
+      res[i] = usr ? ('@ ' + usr.name) : '@ (unknown user)';
     }
     else {
       result = commandMatch.exec(w);
