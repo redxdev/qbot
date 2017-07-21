@@ -70,7 +70,7 @@ slack.on('message', function(msg) {
       }
 
       db.get(user, function (err, value) {
-        var quotes = err.notFound ? [] : value;
+        var quotes = err ? [] : value;
         if (quotes.length === 0) {
           slack.sendMsg(msg.channel, "I don't have any data for that user :(");
         }
