@@ -3,6 +3,7 @@ var jetpack = require('fs-jetpack');
 var markov = require('markov');
 var importer = require('./import');
 var argv = require('yargs').argv;
+var levelup = require('levelup');
 
 var localUserId = null;
 
@@ -18,9 +19,26 @@ var slack = new slackAPI({
   'logging': false
 });
 
-var data = jetpack.read('data.json', 'json') || {
-  users: {}
-};
+var db = levelup('./quotes.db', {valueEncoding: 'json'});
+if (argv.importdb) {
+  console.log("Importing old json database...");
+  var data = jetpack.read('data.json', 'json') || {
+    users: {}
+  };
+
+  var batch = db.batch();
+  for (var key in data.users) {
+    if (!data.users.hasOwnProperty(key)) continue;
+
+    batch.put(key, data.users[key]);
+  }
+
+  batch.write();
+
+  console.log("Complete!");
+
+  return;
+}
 
 console.log('Started qbot!');
 
@@ -44,63 +62,67 @@ slack.on('message', function(msg) {
     if (result) {
       var user = result[1];
       console.log("[Lookup] User ID: " + user);
-      if(data.users[user] === undefined)
-        data.users[user] = [];
-      
       if (config['ignore'].indexOf(user) >= 0) {
         slack.sendMsg(msg.channel, "That user is ignored, sorry!");
+        return;
       }
-      else if(data.users[user].length === 0) {
-        slack.sendMsg(msg.channel, "I don't have any data for that user!");
-      }
-      else if (data.users[user].length < 2) {
-        slack.sendMsg(msg.channel, "I don't have enough data for that user!");
-      }
-      else {
-        var m = markov(config.order);
-        for (var i = 0; i < data.users[user].length; ++i) {
-          m.seed(data.users[user][i]);
-        }
 
-        var start = data.users[user][Math.floor(Math.random()*data.users[user].length)];
-        start = start.split(" ");
-        var res = m.respond(scan).join(' ');
-        res = '<@' + user + '> says, "' + res + '"';
-        console.log('[Response] ' + res);
-        slack.sendMsg(msg.channel, res);
-      }
+      db.get(user, function (err, value) {
+        var quotes = err.notFound ? [] : value;
+        if (quotes.length === 0) {
+          slack.sendMsg(msg.channel, "I don't have any data for that user :(");
+        }
+        else if (quotes.length < 2) {
+          slack.sendMsg(msg.channel, "I don't have enough data for that user :(");
+        }
+        else {
+          var m = markov(config.order);
+          quotes.forEach(function (q) {m.seed(q);});
+
+          var res = m.respond(scan).join(' ');
+          res = '<@' + user + '> says, "' + res + '"';
+          console.log('[Response] ' + res);
+          slack.sendMsg(msg.channel, res);
+        }
+      });
     }
     else {
       var m = markov(config.order);
-      for (var k in data.users) {
-        var user = data.users[k];
-        for (var i = 0; i < user.length; ++i) {
-          m.seed(user[i]);
-        }
-      }
-
-      var res = m.respond(scan).join(' ');
-      console.log('[Response] ' + res);
-      slack.sendMsg(msg.channel, res);
+      db.createValueStream()
+        .on('data', function (data) {
+          m.seed(data);
+        })
+        .on('error', function (err) {
+          slack.sendMsg(msg.channel, "Something went wrong!");
+          console.log('[Error] ' + err);
+        })
+        .on('end', function () {
+          var res = m.respond(scan).join(' ');
+          console.log('[Response] ' + res);
+          slack.sendMsg(msg.channel, res);
+        });
     }
   }
   else {
-    if (msg.text.length > 200) return;
-    
-    if (data.users[msg.user] === undefined)
-      data.users[msg.user] = [];
-    
-    var text = msg.text.trim();
-    var lowerText = text.toLowerCase();
-    var messages = data.users[msg.user];
-    for (var i = 0; i < messages.length; ++i) {
-      if (lowerText === messages[i].toLowerCase()) {
-        console.log('Duplicate - ignoring');
-        return;
-      }
+    if (msg.text.length > 200) {
+      console.log("Message too long - ignoring");
+      return;
     }
 
-    data.users[msg.user].push(text);
-    jetpack.write('data.json', data, {atomic: true});
+    db.get(user, function (err, value) {
+      var quotes = err.notFound ? [] : value;
+      
+      var text = msg.text.trim();
+      var lowerText = text.toLowerCase();
+      for (var i = 0; i < quotes.length; ++i) {
+        if (lowerText === quotes[i].toLowerCase()) {
+          console.log('Duplicate - ignoring');
+          return;
+        }
+      }
+
+      quotes.push(text);
+      db.put(user, quotes);
+    });
   }
 });
