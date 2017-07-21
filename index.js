@@ -33,9 +33,10 @@ if (argv.importdb) {
     batch.put(key, data.users[key]);
   }
 
-  batch.write();
-
-  console.log("Complete!");
+  batch.write(function () {
+    console.log("Complete!");
+    db.close();
+  });
 
   return;
 }
