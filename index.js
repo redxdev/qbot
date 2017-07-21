@@ -135,6 +135,7 @@ slack.on('message', function(msg) {
 
     if (!msg.user) {
       console.log("Undefined user received as part of message!");
+      console.log(msg);
       return;
     }
 
