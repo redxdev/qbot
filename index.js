@@ -126,6 +126,8 @@ slack.on('message', function(msg) {
 
       quotes.push(text);
       db.put(msg.user, quotes);
+
+      globalM.seed(text);
     });
   }
 });
