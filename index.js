@@ -36,6 +36,7 @@ if (argv.importdb) {
   batch.write(function () {
     console.log("Complete!");
     db.close();
+    process.exit();
   });
 
   return;
