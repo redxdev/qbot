@@ -42,6 +42,17 @@ if (argv.importdb) {
   return;
 }
 
+var globalM = markov(config.order);
+db.createValueStream()
+  .on('data', function (data) {
+    data.forEach(function (q) {globalM.seed(q);});
+  })
+  .on('error', function (err) {
+    console.log('[Error] ' + err);
+  }).on('end', function () {
+    console.log('Global markov seed complete');
+  });
+
 console.log('Started qbot!');
 
 slack.on('message', function(msg) {
@@ -89,20 +100,10 @@ slack.on('message', function(msg) {
       });
     }
     else {
+      var res = globalM.respond(scan).join(' ');
+      console.log('[Response] ' + res);
+      slack.sendMsg(msg.channel, res);
       var m = markov(config.order);
-      db.createValueStream()
-        .on('data', function (data) {
-          data.forEach(function (q) {m.seed(q);});
-        })
-        .on('error', function (err) {
-          slack.sendMsg(msg.channel, "Something went wrong!");
-          console.log('[Error] ' + err);
-        })
-        .on('end', function () {
-          var res = m.respond(scan).join(' ');
-          console.log('[Response] ' + res);
-          slack.sendMsg(msg.channel, res);
-        });
     }
   }
   else {
