@@ -49,7 +49,7 @@ function scrapeCommand(slack, db, msg, cmd, args) {
     }
 
     var type = args[0];
-    var location = args[1];
+    var location = args[1].replace('<', '').replace('>', '');
     var store = '+' + args[2];
 
     switch (type.toLowerCase()) {
