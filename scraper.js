@@ -7,14 +7,7 @@ function redditScrape(slack, db, msg, location, store) {
     unirest.get(location)
     .headers({'Accept': 'application/json'})
     .end(function (response) {
-        var data;
-        try {
-            data = JSON.parse(response.body);
-        }
-        catch (e) {
-            slack.sendMsg(msg.channel, "Invalid response from reddit, did you use a json url?");
-            return;
-        }
+        var data = response.body;
 
         if (data.kind != "Listing") {
             slack.sendMsg(msg.channel, "reddit url must be a listing");
