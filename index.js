@@ -162,6 +162,7 @@ slack.on('message', function(msg) {
       var parts = scan.split(' ');
 
       console.log('Running ' + cmdname);
+      console.log(parts);
       commands.run(slack, db, msg, cmdname, parts);
     }
     else {
