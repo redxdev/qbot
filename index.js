@@ -128,8 +128,8 @@ slack.on('message', function(msg) {
       });
     }
     else if(storeResult) {
-      scan = scan.substring(result[1].length);
-      var store = result[1];
+      scan = scan.substring(storeResult[0].length);
+      var store = storeResult[1];
       db.get(store, function (err, value) {
         var quotes = err ? [] : value;
         if (quotes.length === 0) {
@@ -157,9 +157,9 @@ slack.on('message', function(msg) {
       }
 
       // command
-      scan = scan.substring(result[1].length);
+      scan = scan.substring(cmdResult[0].length);
       var parts = scan.split(' ');
-      var cmdname = result[1];
+      var cmdname = cmdResult[1];
 
       console.log('Running ' + cmdname);
       commands.run(slack, db, msg, cmdname, parts);
