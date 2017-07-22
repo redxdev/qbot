@@ -133,7 +133,7 @@ slack.on('message', function(msg) {
       db.get(store, function (err, value) {
         var quotes = err ? [] : value;
         if (quotes.length === 0) {
-          slack.sendMsg(msg.channel, "I don't have any data for " + store + ":(");
+          slack.sendMsg(msg.channel, "I don't have any data for " + store + " :(");
         }
         else if (quotes.length < 2) {
           slack.sendMsg(msg.channel, "I don't have enough data for " + store + " :(");
