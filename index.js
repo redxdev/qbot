@@ -129,7 +129,7 @@ slack.on('message', function(msg) {
     }
     else if(storeResult) {
       var store = storeResult[1].split(' ')[0];
-      scan = scan.substring(store.length).trim();
+      scan = scan.substring(store.length-1).trim();
       db.get(store, function (err, value) {
         var quotes = err ? [] : value;
         if (quotes.length === 0) {
@@ -158,7 +158,7 @@ slack.on('message', function(msg) {
 
       // command
       var cmdname = cmdResult[1].split(' ')[0];
-      scan = scan.substring(cmdname.length).trim();
+      scan = scan.substring(cmdname.length-1).trim();
       var parts = scan.split(' ');
 
       console.log('Running ' + cmdname);
