@@ -93,8 +93,8 @@ slack.on('message', function(msg) {
     
     var scan = msg.text.substring(toSelf.length).trim();
     var match = /^<@(U........)>.*$/g;
-    var storeMatch = /^\+(.*)(\s.+$|$)/g
-    var cmdMatch = /^!(.*)(\s.+$|$)/g
+    var storeMatch = /^\+(.*)$/g
+    var cmdMatch = /^!(.*)$/g
     var result = match.exec(scan);
     var storeResult = storeMatch.exec(scan);
     var cmdResult = cmdMatch.exec(scan);
@@ -128,8 +128,8 @@ slack.on('message', function(msg) {
       });
     }
     else if(storeResult) {
-      scan = scan.substring(storeResult[0].length);
-      var store = storeResult[1];
+      var store = storeResult[1].split(' ')[0];
+      scan = scan.substring(store.length).trim();
       db.get(store, function (err, value) {
         var quotes = err ? [] : value;
         if (quotes.length === 0) {
@@ -157,9 +157,9 @@ slack.on('message', function(msg) {
       }
 
       // command
-      scan = scan.substring(cmdResult[0].length);
+      var cmdname = cmdResult[1].split(' ')[0];
+      scan = scan.substring(store.length).trim();
       var parts = scan.split(' ');
-      var cmdname = cmdResult[1];
 
       console.log('Running ' + cmdname);
       commands.run(slack, db, msg, cmdname, parts);
