@@ -21,7 +21,7 @@ function resetCommand(slack, db, msg, cmd, args) {
 
     var match = /<U(.*)>$/g;
     match = match.exec(args[0]);
-    var store;
+    var store = args[0];
     if (match) {
         store = match[1];
     }
