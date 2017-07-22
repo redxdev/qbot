@@ -158,7 +158,7 @@ slack.on('message', function(msg) {
 
       // command
       var cmdname = cmdResult[1].split(' ')[0];
-      scan = scan.substring(store.length).trim();
+      scan = scan.substring(cmdname.length).trim();
       var parts = scan.split(' ');
 
       console.log('Running ' + cmdname);
