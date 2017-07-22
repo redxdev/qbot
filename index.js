@@ -4,6 +4,8 @@ var markov = require('markov');
 var importer = require('./import');
 var argv = require('yargs').argv;
 var levelup = require('levelup');
+var commands = require('./commands');
+require('./scraper');
 
 var localUserId = null;
 
@@ -89,10 +91,15 @@ slack.on('message', function(msg) {
   if (msg.text.indexOf(toSelf) === 0) {
     slack.sendTyping(msg.channel);
     
-    var scan = msg.text.substring(toSelf.length);
-    var match = /^.*<@(U........)>.*$/g;
+    var scan = msg.text.substring(toSelf.length).trim();
+    var match = /^<@(U........)>.*$/g;
+    var storeMatch = /^\+(.*)(\s.+$|$)/g
+    var cmdMatch = /^!(.*)(\s.+$|$)/g
     var result = match.exec(scan);
+    var storeResult = storeMatch.exec(scan);
+    var cmdResult = cmdMatch.exec(scan);
     if (result) {
+      scan = scan.substring(result[1].length);
       var user = result[1];
       console.log("[Lookup] User ID: " + user);
       if (config['ignore'].indexOf(user) >= 0) {
@@ -120,10 +127,47 @@ slack.on('message', function(msg) {
         }
       });
     }
+    else if(storeResult) {
+      scan = scan.substring(result[1].length);
+      var store = result[1];
+      db.get(store, function (err, value) {
+        var quotes = err ? [] : value;
+        if (quotes.length === 0) {
+          slack.sendMsg(msg.channel, "I don't have any data for that :(");
+        }
+        else if (quotes.length < 2) {
+          slack.sendMsg(msg.channel, "I don't have enough data for that :(");
+        }
+        else {
+          var m = markov(config.order);
+          quotes.forEach(function (q) {m.seed(q);});
+          var res = m.respond(scan);
+
+          var res = processResponse(m.respond(scan)).join(' ');
+          res = '"' + res + '"';
+          console.log('[Response] ' + res);
+          slack.sendMsg(msg.channel, res);
+        }
+      });
+    }
+    else if(cmdResult) {
+      if (config.admins.indexOf(msg.user) < 0) {
+        slack.sendMsg(msg.channel, "You don't have permission to do that!");
+        return;
+      }
+
+      // command
+      scan = scan.substring(result[1].length);
+      var parts = scan.split(' ');
+      var cmdname = result[1];
+
+      console.log('Running ' + cmdname);
+      commands.run(slack, db, msg, cmdname, parts);
+    }
     else {
       var res = processResponse(globalM.respond(scan)).join(' ');
       console.log('[Response] ' + res);
-      slack.sendMsg(msg.channel, res);
+      slack.sendMsg(msg.channel, '"' + res + '"');
       var m = markov(config.order);
     }
   }
