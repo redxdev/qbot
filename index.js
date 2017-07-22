@@ -163,7 +163,7 @@ slack.on('message', function(msg) {
 
       console.log('Running ' + cmdname);
       console.log(parts);
-      commands.run(slack, db, msg, cmdname, parts);
+      commands.run(slack, db, msg, cmdname, parts, globalM);
     }
     else {
       var res = processResponse(globalM.respond(scan)).join(' ');

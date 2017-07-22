@@ -1,12 +1,12 @@
 var commands = {};
 
-function run(slack, db, msg, cmd, args) {
+function run(slack, db, msg, cmd, args, globalM) {
     if (commands[cmd] === undefined) {
         slack.sendMsg(msg.channel, "Unknown command !" + cmd);
         return;
     }
 
-    commands[cmd](slack, db, msg, cmd, args);
+    commands[cmd](slack, db, msg, cmd, args, globalM);
 }
 
 function register(name, func) {

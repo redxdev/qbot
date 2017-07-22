@@ -2,7 +2,7 @@ var unirest = require('unirest');
 
 var commands = require('./commands');
 
-function redditScrape(slack, db, msg, location, store) {
+function redditScrape(slack, db, msg, location, store, globalM) {
     console.log("Scraping reddit: " + location + " to " + store);
     unirest.get(location)
     .headers({'Accept': 'application/json'})
@@ -24,6 +24,7 @@ function redditScrape(slack, db, msg, location, store) {
                     return;
 
                 value.push(p.data.title);
+                globalM.seed(p.data.title);
             });
 
             db.put(store, value);
@@ -34,7 +35,7 @@ function redditScrape(slack, db, msg, location, store) {
 }
 
 // !scrape <type> <location> <store>
-function scrapeCommand(slack, db, msg, cmd, args) {
+function scrapeCommand(slack, db, msg, cmd, args, globalM) {
     if (args.length !== 3) {
         slack.sendMsg(msg.channel, "!scrape <type> <location> <store>");
         return;
@@ -50,7 +51,7 @@ function scrapeCommand(slack, db, msg, cmd, args) {
         return;
 
     case 'reddit':
-        redditScrape(slack, db, msg, location, store);
+        redditScrape(slack, db, msg, location, store, globalM);
         break;
     }
 }
