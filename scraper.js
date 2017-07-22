@@ -14,16 +14,16 @@ function redditScrape(slack, db, msg, location, store) {
             return;
         }
 
-        var posts = data.data.children.data;
+        var posts = data.data.children;
         console.log("Found " + posts.length + " posts");
 
         db.get(store, function (err, value) {
             if (err) value = [];
             posts.forEach(function (p) {
-                if (value.indexOf(p.title) >= 0)
+                if (value.indexOf(p.data.title) >= 0)
                     return;
 
-                value.push(p.title);
+                value.push(p.data.title);
             });
 
             db.put(store, value, function () {
