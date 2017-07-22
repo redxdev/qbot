@@ -26,10 +26,9 @@ function redditScrape(slack, db, msg, location, store) {
                 value.push(p.data.title);
             });
 
-            db.put(store, value, function () {
-                console.log("Scraping complete");
-                slack.sendMsg("Scraping complete");
-            });
+            db.put(store, value);
+            console.log("Scraping complete");
+            slack.sendMsg(msg.channel, "Scraping complete, found " + posts.length + " posts");
         });
     });
 }
