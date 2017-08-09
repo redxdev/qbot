@@ -93,6 +93,7 @@ slack.on('message', function(msg) {
     
     var scan = msg.text.substring(toSelf.length).trim();
     var match = /^<@(U........)>.*$/g;
+    var remove = /\\(r|n)/g
     var storeMatch = /^\+(.*)$/g
     var cmdMatch = /^!(.*)$/g
     var result = match.exec(scan);
@@ -121,6 +122,7 @@ slack.on('message', function(msg) {
           var res = m.respond(scan);
 
           var res = processResponse(m.respond(scan)).join(' ');
+          res = res.replace(remove, "");
           res = '<@' + user + '> says, "' + res + '"';
           console.log('[Response] ' + res);
           slack.sendMsg(msg.channel, res);
@@ -144,6 +146,7 @@ slack.on('message', function(msg) {
           var res = m.respond(scan);
 
           var res = processResponse(m.respond(scan)).join(' ');
+          res = res.replace(remove, "");
           res = '"' + res + '"';
           console.log('[Response] ' + res);
           slack.sendMsg(msg.channel, res);
@@ -167,6 +170,7 @@ slack.on('message', function(msg) {
     }
     else {
       var res = processResponse(globalM.respond(scan)).join(' ');
+      res = res.replace(remove, "");
       console.log('[Response] ' + res);
       slack.sendMsg(msg.channel, '"' + res + '"');
       var m = markov(config.order);
