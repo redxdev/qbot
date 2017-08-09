@@ -93,7 +93,7 @@ slack.on('message', function(msg) {
     
     var scan = msg.text.substring(toSelf.length).trim();
     var match = /^<@(U........)>.*$/g;
-    var remove = /\\(r|n)/g
+    var remove = /\\(r|n)/g;
     var storeMatch = /^\+(.*)$/g
     var cmdMatch = /^!(.*)$/g
     var result = match.exec(scan);
